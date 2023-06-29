@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Excel to JSON</title>
+</head>
+<body>
+  <div id="text-container"></div>
+
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    var filePath = '/Users/bramschork/Documents/cocktails/src/data/donations.xlsx';
+    // Function to convert Excel to JSON
+    function excelToJson(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, { type: 'array' });
+        var worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        var headers = jsonData.shift();
+        var jsonResult = [];
+
+        jsonData.forEach(function(row) {
+          var obj = {};
+          row.forEach(function(value, index) {
+            obj[headers[index]] = value;
+          });
+          jsonResult.push(obj);
+        });
+
+        displayText(jsonResult);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Function to display the data as plain text
+    function displayText(jsonData) {
+      var textContainer = document.getElementById('text-container');
+
+      // Clear any existing text
+      textContainer.textContent = '';
+
+      jsonData.forEach(function(row) {
+        Object.keys(row).forEach(function(key) {
+          var p = document.createElement('p');
+          p.textContent = key + ': ' + row[key];
+          textContainer.appendChild(p);
+        });
+
+        var hr = document.createElement('hr');
+        textContainer.appendChild(hr);
+      });
+    }
+
+    // Handle the file input change event
+    document.getElementById('file-input').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      excelToJson(filePath);
+    });
+  </script>
+</body>
+</html>
