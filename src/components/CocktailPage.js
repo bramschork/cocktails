@@ -2,11 +2,12 @@ import React from "react";
 import useScrollTop from "../hooks/useScrollTop";
 import useEnrichCocktail from "../hooks/useEnrichCocktail";
 import { connect } from "react-redux";
-import { Fade, Box, Grid } from "@material-ui/core";
+import { Fade, Box, Grid, Typography } from "@material-ui/core";
 import { currentCocktailSelector } from "../selectors";
 import { makeStyles } from "@material-ui/core/styles";
 import CocktailDetail from "./CocktailPage/CocktailDetail";
 import CocktailVariantList from "./CocktailPage/CocktailVariantList";
+import jsonData from '/Users/bramschork/Documents/cocktails/src/data/data.json';
 
 const fullHeight = "92vh";
 
@@ -35,6 +36,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+
 export const CocktailPage = ({ cocktail }) => {
   const classes = useStyles();
   useScrollTop();
@@ -62,21 +64,25 @@ export const CocktailPage = ({ cocktail }) => {
           </div>
         </Grid>
         <Grid item md={6} xs={false}>
-          <Fade in={!!image}>
-            <div
-              style={
-                image && {
-                  backgroundImage: `url(${image})`
-                }
-              }
-              className={classes.cocktailImage}
-            />
-          </Fade>
+          <div id="json-container">
+            {jsonData.map((record, index) => (
+              <div key={index}>
+                {Object.entries(record).map(([key, value]) => (
+                  <div key={key}>
+                    <Typography variant="h6">{key}</Typography>
+                    <Typography>{value}</Typography>
+                    <hr />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </Grid>
       </Grid>
     </>
   );
 };
+
 
 const mapStateToProps = (state, ownProps) => ({
   cocktail: currentCocktailSelector(state, ownProps)
